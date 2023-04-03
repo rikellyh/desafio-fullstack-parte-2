@@ -1,9 +1,12 @@
-import Home from './pages/Home/Home';
+import Providers from './contexts/Providers';
+import RoutesMain from './routes';
 
 function App() {
   return (
     <>
-      <Home />
+      <Providers>
+        <RoutesMain />
+      </Providers>
     </>
   );
 }
