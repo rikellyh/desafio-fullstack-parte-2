@@ -1,22 +1,22 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 
 const ProtectedRoutes = () => {
-  const { user, setLoading } = useContext(AuthContext);
+  const { setLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!user) {
-      const pathname = window.location.pathname;
-      if (pathname !== '/') {
-        setLoading(true);
-      }
-      navigate('/');
-    }
-  });
+  const token = localStorage.getItem('@yContacts:token');
 
-  return <>{user && <Outlet />}</>;
+  if (!token) {
+    const pathname = window.location.pathname;
+    if (pathname !== '/') {
+      setLoading(true);
+    }
+    navigate('/');
+  }
+
+  return <>{token && <Outlet />}</>;
 };
 
 export default ProtectedRoutes;

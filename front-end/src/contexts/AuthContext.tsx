@@ -4,8 +4,8 @@ import { toast } from 'react-toastify';
 
 import api from '../services/api';
 import { IContact } from './DashboardContext';
-import { iLoginFormData } from '../pages/Login/Login';
-import { iRegisterFormData } from '../pages/Home/Home';
+import { iRegisterFormData } from '../components/Form';
+import { iLoginFormData } from '../components/Form/Login';
 
 interface IUserProviderProps {
   children: ReactNode;
@@ -34,7 +34,7 @@ export const AuthContext = createContext<IUserContextData>(
 export const AuthProvider = ({ children }: IUserProviderProps) => {
   const [user, setUser] = useState<iUser | null>(null);
   const [loading, setLoading] = useState(false);
-  const backPage = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: IUserProviderProps) => {
           setUser(data);
         } catch (error) {
           localStorage.clear();
-          backPage('/');
+          navigate('/');
         } finally {
           setLoading(false);
         }
@@ -62,11 +62,9 @@ export const AuthProvider = ({ children }: IUserProviderProps) => {
   const registerApi = async (data: iRegisterFormData) => {
     try {
       await api.post('/profile', data);
-      toast.success('Cadastro efetuado com sucesso! 🤩');
+      console.log(data);
     } catch (error) {
-      toast.error('Ops! Algo deu errado 👀', {
-        toastId: 1,
-      });
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -75,17 +73,15 @@ export const AuthProvider = ({ children }: IUserProviderProps) => {
   const loginApi = async (data: iLoginFormData) => {
     try {
       setLoading(true);
-
       const response = await api.post('/login', data);
-      const { user: userResponse, token } = response.data;
+
+      const { token } = response.data;
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      setUser(userResponse);
-
       localStorage.setItem('@yContacts:token', token);
-      const toNavigate = location.state?.from?.pathname || 'dashboard';
-      backPage(toNavigate, { replace: true });
-      localStorage.setItem('@yContacts:user', JSON.stringify(userResponse.id));
+
+      const toNavigate = location.state?.from?.pathname || '/dashboard';
+      navigate(toNavigate);
     } catch (error) {
       toast.error(
         'Você não tem permissão para acessar este tipo de recurso ✋'
@@ -94,11 +90,10 @@ export const AuthProvider = ({ children }: IUserProviderProps) => {
       setLoading(false);
     }
   };
-
   const userLogout = (): void => {
     setUser(null);
     localStorage.clear();
-    backPage('/');
+    navigate('/');
   };
 
   return (
