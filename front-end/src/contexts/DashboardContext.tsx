@@ -1,4 +1,10 @@
-import { createContext, useState, useEffect } from 'react';
+import {
+  createContext,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 
@@ -21,7 +27,9 @@ interface IDashboardContext {
   deletContact: (id: string) => void;
   removeContact: (id: string) => void;
   contact: IContact[];
-  setContactId: React.Dispatch<React.SetStateAction<string>>;
+  setContactId: Dispatch<SetStateAction<string>>;
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+  showModal: boolean;
 }
 
 export const DashboardContext = createContext<IDashboardContext>(
@@ -31,6 +39,7 @@ export const DashboardContext = createContext<IDashboardContext>(
 export const DashboardProvider = ({ children }: iDefaultContextProps) => {
   const [contact, setContacts] = useState([] as IContact[]);
   const [contactId, setContactId] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const getContact = async () => {
     try {
@@ -109,6 +118,8 @@ export const DashboardProvider = ({ children }: iDefaultContextProps) => {
         removeContact,
         contact,
         setContactId,
+        showModal,
+        setShowModal,
       }}
     >
       {children}
